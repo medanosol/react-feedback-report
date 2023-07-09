@@ -23,9 +23,11 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
       <Component
-        onCapture={() => console.log("")}
+        onCapture={({ date, feedback, image, path }) => {
+          console.log({ date, feedback, image, path });
+        }}
         trigger={<button>Click me</button>}
-      ></Component>
+      />
     </>
   );
 }

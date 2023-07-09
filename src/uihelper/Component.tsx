@@ -1,6 +1,14 @@
+import clsx from "clsx";
 import html2canvas from "html2canvas";
 import React, { useEffect, useState } from "react";
 import { Rnd } from "react-rnd";
+
+interface CaptureFeedback {
+  image: string;
+  feedback: string;
+  date: Date;
+  path: string;
+}
 
 interface Props {
   trigger: React.ReactElement<
@@ -9,17 +17,30 @@ interface Props {
       HTMLButtonElement
     >
   >;
-
-  onCapture: (image: any, feedback: string) => void;
+  onCapture: (captureFeedback: CaptureFeedback) => void;
+  feedbackInputClassName?: string;
 }
-const Component: React.FC<Props> = ({ trigger, onCapture }) => {
+const Component: React.FC<Props> = ({
+  trigger,
+  onCapture,
+  feedbackInputClassName,
+}) => {
+  // add ! at the beggining of each className of fedbakcInputClassName
+  feedbackInputClassName = feedbackInputClassName
+    ?.split(" ")
+    .map((className) => {
+      return `!${className}`;
+    })
+    .join(" ");
+
+  const [isDragging, setIsDragging] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [state, setState] = useState({
     width: "200px",
     height: "200px",
-    x: 10,
-    y: 10,
+    x: 0,
+    y: 0,
   });
   useEffect(() => {
     // detect if the textarea is full. if it is, make it bigger
@@ -68,15 +89,26 @@ const Component: React.FC<Props> = ({ trigger, onCapture }) => {
         if (croppedCanvas) {
           const dataUrl = croppedCanvas.toDataURL();
           // download
-          const link = document.createElement("a");
-          link.download = "image.png";
-          link.href = dataUrl;
-          link.click();
-          link.remove();
-          // show the capture section
-          if (captureSection) {
-            captureSection.style.visibility = "visible";
-          }
+          // const link = document.createElement("a");
+          // link.download = "image.png";
+          // link.href = dataUrl;
+          // link.click();
+          // link.remove();
+          onCapture({
+            image: dataUrl,
+            feedback,
+            date: new Date(),
+            path: window.location.pathname,
+          });
+          // reset the state
+          setIsCapturing(false);
+          setFeedback("");
+          setState({
+            width: "200px",
+            height: "200px",
+            x: 0,
+            y: 0,
+          });
         }
       });
     }
@@ -97,10 +129,11 @@ const Component: React.FC<Props> = ({ trigger, onCapture }) => {
       {isCapturing && (
         <Rnd
           id="capture-section"
-          className="relative bg-transparent border-2 border-white border-dashed rounded-t-lg shadow-lg "
+          className="bg-transparent border-2 border-white border-dashed rounded-t-lg shadow-lg "
           size={{ width: state.width, height: state.height }}
           position={{ x: state.x, y: state.y }}
           onDragStop={(e, d) => {
+            setIsDragging(false);
             setState((state) => {
               return { ...state, x: d.x, y: d.y };
             });
@@ -115,20 +148,57 @@ const Component: React.FC<Props> = ({ trigger, onCapture }) => {
           bounds={"body"}
           minWidth={100}
           minHeight={100}
+          onDrag={() => {
+            setIsDragging(true);
+          }}
         >
           <textarea
             onChange={(e) => {
               setFeedback(e.target.value);
             }}
+            style={{
+              opacity: isDragging ? 0.1 : 1,
+            }}
             value={feedback}
-            className="absolute w-[calc(100%+4px)] -left-[2px] h-6 bg-white -bottom-[26px] rounded-b-md border-none text-black text-center"
+            className={clsx(
+              "absolute w-[calc(100%+4px)] -left-[2px] h-6 bg-white -bottom-1 translate-y-full rounded-b-md border-none text-black text-center px-1",
+              feedbackInputClassName && feedbackInputClassName
+            )}
             placeholder="Enter feedback"
           />
           <button
-            onClick={handleCapture}
-            className="absolute bottom-0 right-0 px-2 py-1 text-center text-black bg-white rounded-bl-md"
+            onClick={() => {
+              if (!feedback) return;
+              handleCapture();
+            }}
+            disabled={!feedback}
+            style={{
+              opacity: isDragging ? 0.1 : 1,
+            }}
+            className="absolute flex items-center justify-center w-10 h-10 p-1 bg-white rounded-full right-1 bottom-1 aspect-square disabled:bg-slate-400 disabled:cursor-not-allowed"
           >
-            Capture
+            <svg
+              id="Layer_1"
+              version="1.1"
+              viewBox="0 0 30 30"
+              className="w-full h-full"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g>
+                <path d="M6,19V17c0-0.552-0.448-1-1-1H5c-0.552,0-1,0.448-1,1V19c0,0.552,0.448,1,1,1H5C5.552,20,6,19.552,6,19z" />
+                <path d="M10,5L10,5c0,0.553,0.448,1,1,1H13c0.552,0,1-0.448,1-1V5c0-0.552-0.448-1-1-1H11C10.448,4,10,4.448,10,5z" />
+                <path d="M5,14L5,14c0.553,0,1-0.448,1-1V11c0-0.552-0.448-1-1-1H5c-0.552,0-1,0.448-1,1V13C4,13.552,4.448,14,5,14z" />
+                <path d="M23,6h1l0,1c0,0.552,0.448,1,1,1h0c0.552,0,1-0.448,1-1V6c0-1.105-0.895-2-2-2h-1c-0.552,0-1,0.448-1,1v0   C22,5.552,22.448,6,23,6z" />
+                <path d="M16,5L16,5c0,0.552,0.448,1,1,1h2c0.552,0,1-0.448,1-1v0c0-0.552-0.448-1-1-1h-2C16.448,4,16,4.448,16,5z" />
+                <path d="M7,24H6v-1c0-0.552-0.448-1-1-1H5c-0.552,0-1,0.448-1,1v1c0,1.105,0.895,2,2,2h1c0.552,0,1-0.448,1-1V25   C8,24.448,7.552,24,7,24z" />
+                <path d="M6,7V6h1c0.552,0,1-0.448,1-1V5c0-0.552-0.448-1-1-1H6C4.895,4,4,4.895,4,6v1c0,0.552,0.448,1,1,1H5C5.552,8,6,7.552,6,7z" />
+                <path d="M24,11l0,2.001c0,0.552,0.448,1,1,1h0c0.552,0,1-0.448,1-1V11c0-0.552-0.448-1-1-1h0C24.448,10,24,10.448,24,11z" />
+              </g>
+              <g>
+                <path d="M25,16h-1.764c-0.758,0-1.45-0.428-1.789-1.106l-0.171-0.342C21.107,14.214,20.761,14,20.382,14h-4.764   c-0.379,0-0.725,0.214-0.894,0.553l-0.171,0.342C14.214,15.572,13.521,16,12.764,16H11c-0.552,0-1,0.448-1,1v8c0,0.552,0.448,1,1,1   h14c0.552,0,1-0.448,1-1v-8C26,16.448,25.552,16,25,16z M18,25c-2.209,0-4-1.791-4-4c0-2.209,1.791-4,4-4s4,1.791,4,4   C22,23.209,20.209,25,18,25z" />
+                <circle cx="18" cy="21" r="2" />
+              </g>
+            </svg>
           </button>
         </Rnd>
       )}
