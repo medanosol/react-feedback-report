@@ -18,52 +18,57 @@ interface Props {
     >
   >;
   onCapture: (captureFeedback: CaptureFeedback) => void;
+  initialPosition?: {
+    width: string;
+    height: string;
+    x: number;
+    y: number;
+  };
   inputClassName?: string;
   buttonClassName?: string;
   captureSectionClassName?: string;
   buttonIcon?: React.ReactNode;
 }
+
 const Component: React.FC<Props> = ({
   trigger,
   onCapture,
+  initialPosition = {
+    width: "200px",
+    height: "200px",
+    x: 0,
+    y: 0,
+  },
   inputClassName,
   buttonClassName,
   captureSectionClassName,
   buttonIcon,
 }) => {
+  // generic function to get the value of a css variable and parse it to int
+  const parseValueToInt = (value: string) => {
+    return parseInt(value.replace("px", "").replace("%", ""));
+  };
+
   // add ! at the beggining of each className
   useEffect(() => {
-    inputClassName = inputClassName
-      ?.split(" ")
-      .map((className) => {
-        return `!${className}`;
-      })
-      .join(" ");
+    const addExclamationMark = (className?: string) => {
+      return className
+        ?.split(" ")
+        .map((className) => {
+          return `!${className}`;
+        })
+        .join(" ");
+    };
 
-    buttonClassName = buttonClassName
-      ?.split(" ")
-      .map((className) => {
-        return `!${className}`;
-      })
-      .join(" ");
-
-    captureSectionClassName = captureSectionClassName
-      ?.split(" ")
-      .map((className) => {
-        return `!${className}`;
-      })
-      .join(" ");
-  }, [inputClassName, buttonClassName]);
+    inputClassName = addExclamationMark(inputClassName);
+    buttonClassName = addExclamationMark(buttonClassName);
+    captureSectionClassName = addExclamationMark(captureSectionClassName);
+  }, [inputClassName, buttonClassName, captureSectionClassName]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [feedback, setFeedback] = useState("");
-  const [state, setState] = useState({
-    width: "200px",
-    height: "200px",
-    x: 0,
-    y: 0,
-  });
+  const [state, setState] = useState(initialPosition);
   useEffect(() => {
     const textarea = document.querySelector("textarea");
 
@@ -107,31 +112,26 @@ const Component: React.FC<Props> = ({
         const cropPositionLeft = croppedCanvasPosition?.left ?? 0;
         const cropPositionTop = croppedCanvasPosition?.top ?? 0;
 
-        croppedCanvas.width = parseInt(cropWidth.replace("px", ""));
-        croppedCanvas.height = parseInt(cropHeigth.replace("px", ""));
+        croppedCanvas.width = parseValueToInt(cropWidth);
+        croppedCanvas.height = parseValueToInt(cropHeigth);
 
         if (croppedCanvasContext) {
           croppedCanvasContext.drawImage(
             canvas,
             cropPositionLeft,
             cropPositionTop,
-            parseInt(cropWidth.replace("px", "")),
-            parseInt(cropHeigth.replace("px", "")),
+            parseValueToInt(cropWidth),
+            parseValueToInt(cropHeigth),
             0,
             0,
-            parseInt(cropWidth.replace("px", "")),
-            parseInt(cropHeigth.replace("px", ""))
+            parseValueToInt(cropWidth),
+            parseValueToInt(cropHeigth)
           );
         }
 
         if (croppedCanvas) {
           const dataUrl = croppedCanvas.toDataURL();
-          // download
-          // const link = document.createElement("a");
-          // link.download = "image.png";
-          // link.href = dataUrl;
-          // link.click();
-          // link.remove();
+
           onCapture({
             image: dataUrl,
             feedback,
@@ -162,13 +162,13 @@ const Component: React.FC<Props> = ({
             },
           });
         }
-        throw new Error("Children must be a valid react element");
+        throw new Error("Children must be a valid React element");
       })}
       {isCapturing && (
         <Rnd
           id="capture-section"
           className={clsx(
-            "bg-transparent border-2 border-white border-dashed rounded-t-lg shadow-lg ",
+            "!fixed bg-transparent border-2 border-white border-dashed rounded-t-lg shadow-lg ",
             captureSectionClassName && captureSectionClassName
           )}
           size={{ width: state.width, height: state.height }}
