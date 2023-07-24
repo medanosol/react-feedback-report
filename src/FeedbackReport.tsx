@@ -25,21 +25,23 @@ interface Props {
     y: number;
   };
   inputClassName?: string;
+  inputPlaceholder?: string;
   buttonClassName?: string;
   captureSectionClassName?: string;
   buttonIcon?: React.ReactNode;
 }
 
-const Component: React.FC<Props> = ({
+const FeedbackReport: React.FC<Props> = ({
   trigger,
   onCapture,
   initialPosition = {
     width: "200px",
     height: "200px",
-    x: 0,
-    y: 0,
+    x: window.innerWidth / 2 - 100,
+    y: window.innerHeight / 2 - 100,
   },
   inputClassName,
+  inputPlaceholder = "Enter feedback...",
   buttonClassName,
   captureSectionClassName,
   buttonIcon,
@@ -109,8 +111,9 @@ const Component: React.FC<Props> = ({
         const croppedCanvas = document.createElement("canvas");
         const croppedCanvasContext = croppedCanvas.getContext("2d");
         const croppedCanvasPosition = captureSection?.getBoundingClientRect();
-        const cropPositionLeft = croppedCanvasPosition?.left ?? 0;
-        const cropPositionTop = croppedCanvasPosition?.top ?? 0;
+        if (!croppedCanvasPosition) return;
+        const cropPositionLeft = croppedCanvasPosition.left ?? 0;
+        const cropPositionTop = croppedCanvasPosition.top + window.scrollY ?? 0;
 
         croppedCanvas.width = parseValueToInt(cropWidth);
         croppedCanvas.height = parseValueToInt(cropHeigth);
@@ -144,8 +147,8 @@ const Component: React.FC<Props> = ({
           setState({
             width: "200px",
             height: "200px",
-            x: 0,
-            y: 0,
+            x: window.innerWidth / 2 - 100,
+            y: window.innerHeight / 2 - 100,
           });
         }
       });
@@ -164,39 +167,40 @@ const Component: React.FC<Props> = ({
         }
         throw new Error("Children must be a valid React element");
       })}
+
       {isCapturing && (
         <Rnd
           id="capture-section"
           className={clsx(
-            "!fixed bg-transparent border-2 border-white border-dashed rounded-t-lg shadow-lg ",
+            "border-2 border-white  rounded-t-lg shadow-lg ",
             captureSectionClassName && captureSectionClassName
           )}
+          style={{
+            borderStyle: "dashed",
+            zIndex: 1000000,
+            background: "none",
+            boxShadow: "0 0 0 100vmax rgba(0,0,0,0.5)",
+          }}
+          dragGrid={[20, 20]}
           size={{ width: state.width, height: state.height }}
           position={{ x: state.x, y: state.y }}
-          onDragStop={(e, d) => {
+          onDragStop={(_, d) => {
             setIsDragging(false);
+            console.log(d);
             setState((state) => {
               return { ...state, x: d.x, y: d.y };
             });
           }}
-          onResizeStop={(e, direction, ref, delta, position) => {
+          onResizeStop={(_, __, ref, ___, position) => {
             setState({
               width: ref.style.width,
               height: ref.style.height,
               ...position,
             });
           }}
-          bounds={"body"}
+          bounds={"window"}
           minWidth={100}
           minHeight={100}
-          onDrag={(e) => {
-            const target = e.target as HTMLElement;
-            // if the source is the textarea, don't drag
-            if (target.id === "feedback-input") {
-              return;
-            }
-            setIsDragging(true);
-          }}
         >
           <textarea
             id="feedback-input"
@@ -208,15 +212,17 @@ const Component: React.FC<Props> = ({
             onChange={(e) => {
               setFeedback(e.target.value);
             }}
-            style={{
-              opacity: isDragging ? 0.1 : 1,
-            }}
             value={feedback}
             className={clsx(
-              "!resize-none !absolute !w-[calc(100%+4px)] !-left-[2px] h-6 bg-white !-bottom-1 !translate-y-full rounded-b-md border-none text-black text-center px-1",
+              " absolute -left-[2px] h-6 bg-white -bottom-1 translate-y-full rounded-b-md border-none text-black text-center px-1",
               inputClassName && inputClassName
             )}
-            placeholder="Enter feedback"
+            style={{
+              opacity: isDragging ? 0.1 : 1,
+              resize: "none",
+              width: "calc(100% + 4px)",
+            }}
+            placeholder={inputPlaceholder}
           />
           <button
             onClick={() => {
@@ -228,7 +234,7 @@ const Component: React.FC<Props> = ({
               opacity: isDragging ? 0.1 : 1,
             }}
             className={clsx(
-              "!absolute !flex !items-center !justify-center w-10 h-10 p-1 bg-white rounded-full right-1 top-1 aspect-square disabled:bg-slate-400 disabled:cursor-not-allowed",
+              "absolute flex items-center justify-center w-10 h-10 p-1 bg-white rounded-full right-1 top-1 aspect-square disabled:bg-slate-400 disabled:cursor-not-allowed",
               buttonClassName && buttonClassName
             )}
           >
@@ -265,4 +271,4 @@ const Component: React.FC<Props> = ({
   );
 };
 
-export default Component;
+export default FeedbackReport;
