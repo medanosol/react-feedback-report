@@ -1,2 +1,2 @@
 import "./tailwind.css";
-export { default as FeedbackReport } from "./FeedbackReport";
+export { default as FeedbackReporter } from "./FeedbackReporter";

@@ -37,8 +37,8 @@ const FeedbackReport: React.FC<Props> = ({
   initialPosition = {
     width: "200px",
     height: "200px",
-    x: window.innerWidth / 2 - 100,
-    y: window.innerHeight / 2 - 100,
+    x: 0,
+    y: 0,
   },
   inputClassName,
   inputPlaceholder = "Enter feedback...",
@@ -71,6 +71,16 @@ const FeedbackReport: React.FC<Props> = ({
   const [isCapturing, setIsCapturing] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [state, setState] = useState(initialPosition);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setState({
+        width: "200px",
+        height: "200px",
+        x: window.innerWidth / 2 - 100,
+        y: window.innerHeight / 2 - 100,
+      });
+    }
+  }, []);
   useEffect(() => {
     const textarea = document.querySelector("textarea");
 
@@ -144,12 +154,14 @@ const FeedbackReport: React.FC<Props> = ({
           // reset the state
           setIsCapturing(false);
           setFeedback("");
-          setState({
-            width: "200px",
-            height: "200px",
-            x: window.innerWidth / 2 - 100,
-            y: window.innerHeight / 2 - 100,
-          });
+          if (typeof window !== "undefined") {
+            setState({
+              width: "200px",
+              height: "200px",
+              x: window.innerWidth / 2 - 100,
+              y: window.innerHeight / 2 - 100,
+            });
+          }
         }
       });
     }
