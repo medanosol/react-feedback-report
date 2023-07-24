@@ -1,17 +1,17 @@
 # React Capture Feedback Component
 
-This is a React component that allows users to capture a section of a website, provide feedback, and report bugs. The captured section is displayed in a frame that can be resized and moved around. Users can enter their feedback in a text area and submit it along with the captured image.
+This is a React component that allows users to capture a section of a website, provide feedback, and report bugs. The captured section is displayed in a frame that can be resized and moved around. Users can enter their feedback in a text area and submit it along with the captured image, the date and the URL.
 
 ## Installation
 
 You can install the package from npm using the following command:
 
 ```bash
-npm install react-feedback-report
+npm i @medanosol/react-feedback-report
 ```
 
 ```base
-yarn add react-feedback-report
+yarn add @medanosol/react-feedback-report
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ To use the component, follow these steps:
 1. Import the component into your React application:
 
 ```javascript
-import { FeedbackReporter } from "react-feedback-report";
+import { FeedbackReporter } from "@medanosol/react-feedback-report";
 ```
 
 2. Render the component in your application, passing the necessary props:
@@ -91,8 +91,7 @@ interface Props {
 Here's an example of how you can use the component:
 
 ```tsx
-import React from "react";
-import { FeedbackReporter } from "react-feedback-report";
+import { FeedbackReporter } from "@medanosol/react-feedback-report";
 
 const App = () => {
   const handleCapture = (FeedbackReporter) => {
