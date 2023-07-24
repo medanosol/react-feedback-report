@@ -1,19 +1,21 @@
 {
   "name": "react-feedback-report",
+  "version": "0.0.1",
+  "description": "A small React package that lets you to take a screenshot of your website and report issues with that specific part.",
+  "license": "MIT",
   "private": false,
   "files": [
     "dist"
   ],
-  "main": "dist/react-screen-capture.js",
-  "module": "dist/react-screen-capture.es.js",
-  "jsnext:main": "dist/react-screen-capture.es.js",
+  "main": "dist/react-feedback-report.js",
+  "module": "dist/react-feedback-report.es.js",
+  "jsnext:main": "dist/react-feedback-report.es.js",
   "types": "dist/src/index.d.ts",
-  "@comment unpkg": "dist/react-screen-capture.umd.js",
+  "@comment unpkg": "dist/react-feedback-report.umd.js",
   "engines": {
     "node": ">=8",
     "npm": ">=5"
   },
-  "version": "0.0.0",
   "keywords": [
     "react",
     "reactjs",

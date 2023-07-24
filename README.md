@@ -7,11 +7,11 @@ This is a React component that allows users to capture a section of a website, p
 You can install the package from npm using the following command:
 
 ```bash
-npm install <package-name>
+npm install react-feedback-report
 ```
 
 ```base
-yarn add <package-name>
+yarn add react-feedback-report
 ```
 
 ## Usage
@@ -20,13 +20,13 @@ To use the component, follow these steps:
 
 1. Import the component into your React application:
 
-   ```javascript
-   import CaptureFeedback from "<package-name>";
-   ```
+```javascript
+import { FeedbackReporter } from "react-feedback-report";
+```
 
 2. Render the component in your application, passing the necessary props:
 
-```jsx
+```tsx
 const App = () => {
   const handleCapture = (captureFeedback) => {
     // Handle the captured feedback data
@@ -35,11 +35,7 @@ const App = () => {
 
   return (
     <div>
-      <CaptureFeedback
-        trigger={<button>Capture Feedback</button>}
-        onCapture={handleCapture}
-        feedbackInputClassName="custom-feedback-input"
-      />
+      <FeedbackReporter onCapture={handleCapture} />
     </div>
   );
 };
@@ -49,8 +45,8 @@ export default App;
 
 3. Customize the trigger button and feedback input appearance by providing appropriate classes. You can use the feedbackInputClassName prop to add custom classes to the feedback input field.
 
-```jsx
-<CaptureFeedback
+```tsx
+<FeedbackReporter
   trigger={<button className="custom-trigger-button">Capture Feedback</button>}
   feedbackInputClassName="custom-feedback-input"
 />
@@ -60,26 +56,52 @@ export default App;
 
 The component accepts the following props:
 
-- trigger (required): A React element that acts as the trigger button to initiate the feedback capture.
-- onCapture (required): A callback function that receives the captured feedback data when the user submits it.
-- feedbackInputClassName (optional): Additional CSS classes to apply to the feedback input field.
+```ts
+interface CaptureFeedback {
+  image: string;
+  feedback: string;
+  date: Date;
+  path: string;
+}
+
+interface Props {
+  trigger: React.ReactElement<
+    React.DetailedHTMLProps<
+      React.ButtonHTMLAttributes<HTMLButtonElement>,
+      HTMLButtonElement
+    >
+  >;
+  onCapture: (captureFeedback: CaptureFeedback) => void;
+  initialPosition?: {
+    width: string;
+    height: string;
+    x: number;
+    y: number;
+  };
+  inputClassName?: string;
+  inputPlaceholder?: string;
+  buttonClassName?: string;
+  captureSectionClassName?: string;
+  buttonIcon?: React.ReactNode;
+}
+```
 
 ## Example
 
 Here's an example of how you can use the component:
 
-```jsx
+```tsx
 import React from "react";
-import CaptureFeedback from "<package-name>";
+import { FeedbackReporter } from "react-feedback-report";
 
 const App = () => {
-  const handleCapture = (captureFeedback) => {
-    console.log(captureFeedback);
+  const handleCapture = (FeedbackReporter) => {
+    console.log(FeedbackReporter);
   };
 
   return (
     <div>
-      <CaptureFeedback
+      <FeedbackReporter
         trigger={<button>Capture Feedback</button>}
         onCapture={handleCapture}
         feedbackInputClassName="custom-feedback-input"
