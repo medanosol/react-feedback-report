@@ -1,6 +1,6 @@
 {
   "name": "@medanosol/react-feedback-report",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A small React package that lets you to take a screenshot of your website and report issues with that specific part.",
   "license": "MIT",
   "private": false,
