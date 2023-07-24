@@ -1,4 +1,4 @@
-# React Capture Feedback Component
+# @medanosol/react-feedback-report
 
 This is a React component that allows users to capture a section of a website, provide feedback, and report bugs. The captured section is displayed in a frame that can be resized and moved around. Users can enter their feedback in a text area and submit it along with the captured image, the date and the URL.
 
