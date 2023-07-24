@@ -198,7 +198,6 @@ const FeedbackReport: React.FC<Props> = ({
           position={{ x: state.x, y: state.y }}
           onDragStop={(_, d) => {
             setIsDragging(false);
-            console.log(d);
             setState((state) => {
               return { ...state, x: d.x, y: d.y };
             });
